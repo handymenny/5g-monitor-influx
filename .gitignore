@@ -36,3 +36,6 @@ known_hosts
 
 # Local config
 .env
+
+# keep actual export config out of the repository
+config/export_config.yaml

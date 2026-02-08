@@ -1,0 +1,36 @@
+ssh_host: 192.168.1.1
+ssh_user: root
+ssh_port: 22
+ssh_password: "REPLACE_WITH_SECURE_PASSWORD"
+timeout: 10.0
+measurement: modem_cells
+
+static_tags:
+  host: 192.168.1.1
+  model: Quectel
+
+allowed_fields:
+  - pci
+  - rsrp
+  - rsrq
+  - sinr
+  - nr_sinr
+  - rssi
+  - arfcn
+  - band
+  - dl_bandwidth
+  - cell_id
+  - tac
+  - ulca
+  - state
+
+derived_tags:
+  carrier_idx: carrier_idx
+  type: type
+  pci: pci
+  arfcn: arfcn
+  mnc: mnc
+
+# Notes:
+# - Copy this file to `config/export_config.yaml` and update sensitive values.
+# - Do NOT commit `config/export_config.yaml` to git. It's ignored by the repository.
