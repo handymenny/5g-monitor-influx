@@ -59,12 +59,7 @@ def parse_response(text: str, prefix: str) -> Iterator[List[str]]:
         yield tokens
 
 
-def parse_int(val: str, default: int = 0, hex: bool = False) -> int:
-    value = parse_optional_int(val, default, hex)
-    return value if value is not None else default
-
-
-def parse_optional_int(
+def parse_int(
     val: str, default: Optional[int] = None, hex: bool = False
 ) -> Optional[int]:
     try:

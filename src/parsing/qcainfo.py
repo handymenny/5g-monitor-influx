@@ -11,7 +11,8 @@ from model.mappings import (
     SCELL_STATE_MAP,
 )
 from model.models import CarrierComponentQCAINFO
-from .common import parse_int, parse_optional_int, parse_response
+from util.optional_helpers import optional_div, optional_map_get
+from .common import parse_int, parse_response
 
 
 def _parse_qcainfo_lte_component(
@@ -20,7 +21,7 @@ def _parse_qcainfo_lte_component(
 ) -> Optional[CarrierComponentQCAINFO]:
     arfcn = parse_int(values[1])
     band = parse_int(values[3].split()[-1])
-    dl_bandwidth = LTE_RB_INDEX_TO_MHZ.get(parse_int(values[2]), 0)
+    dl_bandwidth = optional_map_get(LTE_RB_INDEX_TO_MHZ, parse_int(values[2]))
     state = (
         PCELL_STATE_MAP.get(values[4])
         if cell_type == CarrierComponentType.LTE_PCC
@@ -38,8 +39,8 @@ def _parse_qcainfo_lte_component(
     ul_arfcn = None
     if cell_type == CarrierComponentType.LTE_SCC:
         ulca = parse_int(values[10])
-        ul_bandwidth = LTE_RB_INDEX_TO_MHZ.get(parse_int(values[11]), None)
-        ul_arfcn = parse_optional_int(values[12])
+        ul_bandwidth = optional_map_get(LTE_RB_INDEX_TO_MHZ, parse_int(values[11]))
+        ul_arfcn = parse_int(values[12])
 
     return CarrierComponentQCAINFO(
         type=cell_type,
@@ -64,7 +65,7 @@ def _parse_qcainfo_nr_component(
 ) -> Optional[CarrierComponentQCAINFO]:
     arfcn = parse_int(values[1])
     band = parse_int(values[3].split()[-1])
-    dl_bandwidth = NR_BW_INDEX_TO_MHZ.get(parse_int(values[2]), 0)
+    dl_bandwidth = optional_map_get(NR_BW_INDEX_TO_MHZ, parse_int(values[2]))
 
     state = None
     ulca = None
@@ -78,13 +79,13 @@ def _parse_qcainfo_nr_component(
         state = SCELL_STATE_MAP.get(values[4])
         pci = parse_int(values[5])
         ulca = parse_int(values[6])
-        ul_bandwidth = NR_BW_INDEX_TO_MHZ.get(parse_int(values[7]), 0)
-        ul_arfcn = parse_optional_int(values[8])
+        ul_bandwidth = optional_map_get(NR_BW_INDEX_TO_MHZ, parse_int(values[7]))
+        ul_arfcn = parse_int(values[8])
         last_index = 8
 
     rsrp = parse_int(values[last_index + 1])
     rsrq = parse_int(values[last_index + 2])
-    sinr = parse_int(values[last_index + 3]) / 100.0
+    sinr = optional_div(parse_int(values[last_index + 3]), 100.0)
 
     return CarrierComponentQCAINFO(
         type=cell_type,
