@@ -4,11 +4,35 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from .mappings import CarrierComponentState, CarrierComponentType, Rat
-from ..util.optional_helpers import optional_avg, optional_round
+from .mappings import (
+    CarrierComponentState,
+    CarrierComponentType,
+    Rat,
+    MCC_RANGE,
+    MNC_RANGE,
+    RSRP_RANGE,
+    RSRQ_RANGE,
+    RSSI_RANGE,
+    SINR_RANGE_4G,
+    SINR_RANGE_5G,
+    PCI_RANGE_4G,
+    PCI_RANGE_5G,
+    ARFCN_RANGE_4G,
+    ARFCN_RANGE_5G,
+    BAND_RANGE_4G,
+    BAND_RANGE_5G,
+    LTE_CELL_ID_RANGE,
+    NR_CELL_ID_RANGE,
+    LTE_TAC_RANGE,
+    NR_TAC_RANGE,
+    CQI_RANGE,
+    TX_POWER_RANGE,
+)
+from util.optional_helpers import optional_avg, optional_round
+from util.validators import check_range
 
 
-@dataclass
+@dataclass(frozen=True)
 class ServingCellQENG:
     rat: Rat
     mcc: Optional[int]
@@ -29,8 +53,44 @@ class ServingCellQENG:
     tx_power: Optional[float] = None
     scs: Optional[int] = None
 
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "mcc", check_range(self.mcc, *MCC_RANGE))
+        object.__setattr__(self, "mnc", check_range(self.mnc, *MNC_RANGE))
 
-@dataclass
+        # Select ranges based on RAT
+        if self.rat == Rat.LTE:
+            pci_range = PCI_RANGE_4G
+            sinr_range = SINR_RANGE_4G
+            arfcn_range = ARFCN_RANGE_4G
+            band_range = BAND_RANGE_4G
+            cell_id_range = LTE_CELL_ID_RANGE
+            tac_range = LTE_TAC_RANGE
+        else:  # NR_NSA or NR_SA
+            pci_range = PCI_RANGE_5G
+            sinr_range = SINR_RANGE_5G
+            arfcn_range = ARFCN_RANGE_5G
+            band_range = BAND_RANGE_5G
+            cell_id_range = NR_CELL_ID_RANGE
+            tac_range = NR_TAC_RANGE
+
+        object.__setattr__(self, "pci", check_range(self.pci, *pci_range))
+        object.__setattr__(self, "rsrp", check_range(self.rsrp, *RSRP_RANGE))
+        object.__setattr__(self, "rsrq", check_range(self.rsrq, *RSRQ_RANGE))
+        object.__setattr__(self, "sinr", check_range(self.sinr, *sinr_range))
+        object.__setattr__(self, "arfcn", check_range(self.arfcn, *arfcn_range))
+        object.__setattr__(self, "band", check_range(self.band, *band_range))
+        object.__setattr__(self, "cell_id", check_range(self.cell_id, *cell_id_range))
+        object.__setattr__(self, "tac", check_range(self.tac, *tac_range))
+        object.__setattr__(self, "rssi", check_range(self.rssi, *RSSI_RANGE))
+        object.__setattr__(self, "cqi", check_range(self.cqi, *CQI_RANGE))
+        object.__setattr__(
+            self,
+            "tx_power",
+            check_range(self.tx_power, *TX_POWER_RANGE),
+        )
+
+
+@dataclass(frozen=True)
 class CarrierComponentQCAINFO:
     type: CarrierComponentType
     arfcn: Optional[int]
@@ -45,6 +105,22 @@ class CarrierComponentQCAINFO:
     ul_arfcn: Optional[int] = None
     rssi: Optional[int] = None
     state: Optional[CarrierComponentState] = None
+
+    def __post_init__(self) -> None:
+        # Select ranges based on component type (LTE vs NR)
+        is_lte = "LTE" in self.type.value
+        arfcn_range = ARFCN_RANGE_4G if is_lte else ARFCN_RANGE_5G
+        band_range = BAND_RANGE_4G if is_lte else BAND_RANGE_5G
+        pci_range = PCI_RANGE_4G if is_lte else PCI_RANGE_5G
+        sinr_range = SINR_RANGE_4G if is_lte else SINR_RANGE_5G
+
+        object.__setattr__(self, "arfcn", check_range(self.arfcn, *arfcn_range))
+        object.__setattr__(self, "band", check_range(self.band, *band_range))
+        object.__setattr__(self, "pci", check_range(self.pci, *pci_range))
+        object.__setattr__(self, "rsrp", check_range(self.rsrp, *RSRP_RANGE))
+        object.__setattr__(self, "rsrq", check_range(self.rsrq, *RSRQ_RANGE))
+        object.__setattr__(self, "sinr", check_range(self.sinr, *sinr_range))
+        object.__setattr__(self, "rssi", check_range(self.rssi, *RSSI_RANGE))
 
 
 @dataclass
