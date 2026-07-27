@@ -2,6 +2,8 @@
 
 Monitor 5G/cellular modem metrics via SSH AT commands and export them in InfluxDB line protocol format. Perfect for integration with Telegraf, InfluxDB, and monitoring stacks.
 
+The project was inspired by [quectel-5g-tools](https://github.com/vjt/quectel-5g-tools).
+
 ## Features
 
 - **SSH-based AT command execution** on remote Quectel modems
