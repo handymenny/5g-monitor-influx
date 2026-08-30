@@ -77,7 +77,6 @@ class MonitorRunner:
                 serving_cells = parse_qeng_servingcell(serving_raw)
                 ca = parse_qcainfo(qca_raw)
                 temp_readings = parse_qtemp(temp_raw, self._config.temp_sensors)
-                print(f"temp_readings: {temp_readings}", file=sys.stderr)
                 pkt_cnt = parse_qgdnrcnt(pkt_cnt_raw)
 
                 timestamp_ns = time.time_ns()
