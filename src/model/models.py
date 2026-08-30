@@ -236,3 +236,9 @@ class CombinedServingCell:
                 )
 
         return combined
+
+
+@dataclass
+class PacketDataCounter:
+    tx_bytes: int
+    rx_bytes: int

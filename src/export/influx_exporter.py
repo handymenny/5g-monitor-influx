@@ -18,8 +18,8 @@ class InfluxExporter:
         self._measurement = config.measurement
         self._static_tags = config.static_tags
 
-    def _cell_fields(self, cell: CombinedServingCell) -> Dict[str, object]:
-        raw = asdict(cell)
+    def _get_fields(self, source) -> Dict[str, object]:
+        raw = asdict(source)
         allowed = self._allowed_fields
         if allowed is None:
             return raw
@@ -93,7 +93,7 @@ class InfluxExporter:
 
         return f"{meas}{tag_str} {field_str} {timestamp_ns}"
 
-    def build_lines(
+    def build_cell_lines(
         self,
         cells: list[CombinedServingCell],
         timestamp_ns: int,
@@ -109,9 +109,31 @@ class InfluxExporter:
                         line_tags[tag_key] = tag_value
 
             line = self.line(
-                self._measurement, line_tags, self._cell_fields(cell), timestamp_ns
+                self._measurement, line_tags, self._get_fields(cell), timestamp_ns
             )
             if line:
                 lines.append(line)
 
         return lines
+
+    def build_pktcnt_line(
+        self,
+        pkt_cnt,
+        timestamp_ns: int,
+    ) -> str | None:
+        line_tags = dict(self._static_tags)
+        raw_fields = asdict(pkt_cnt)
+
+        for tag_key, field_key in self._derived_tags.items():
+            if field_key in raw_fields:
+                tag_value = self._tag_value(raw_fields[field_key])
+                if tag_value is not None:
+                    line_tags[tag_key] = tag_value
+
+        line = self.line(
+            self._measurement, line_tags, self._get_fields(pkt_cnt), timestamp_ns
+        )
+        if line:
+            return line
+
+        return None

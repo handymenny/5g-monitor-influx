@@ -10,6 +10,11 @@ static_tags:
   model: Quectel
 
 allowed_fields:
+  # All included in this example - remove any fields you don't want to export 
+  - rat
+  - mcc
+  - mnc
+  - carrier_idx
   - pci
   - rsrp
   - rsrq
@@ -19,12 +24,22 @@ allowed_fields:
   - arfcn
   - band
   - dl_bandwidth
+  - ul_bandwidth
   - cell_id
+  - duplex
   - tac
+  - cqi
+  - tx_power
+  - scs
+  - type
   - ulca
+  - ul_arfcn
   - state
+  - tx_bytes
+  - rx_bytes
 
 derived_tags:
+  # You can add any fields you want to use as tags here. The key is the tag name, and the value is the field name to derive it from.
   carrier_idx: carrier_idx
   type: type
   pci: pci
