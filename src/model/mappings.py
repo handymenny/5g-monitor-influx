@@ -4,6 +4,24 @@
 from enum import Enum
 
 
+class Source(str, Enum):
+    QENG_SERVINGCELL = "QENG_SERVINGCELL"
+    QCAINFO = "QCAINFO"
+    QGDNRCNT = "QGDNRCNT"
+
+    # from string to Source enum
+    @classmethod
+    def from_string(cls, source_str: str) -> "Source":
+        if source_str == "QENG_SERVINGCELL":
+            return cls.QENG_SERVINGCELL
+        elif source_str == "QCAINFO":
+            return cls.QCAINFO
+        elif source_str == "QGDNRCNT":
+            return cls.QGDNRCNT
+        else:
+            raise ValueError(f"Unknown source string: {source_str}")
+
+
 class Rat(str, Enum):
     LTE = "LTE"
     NR_NSA = "5G-NSA"

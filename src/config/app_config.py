@@ -3,8 +3,8 @@
 
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
-
 import yaml
+from model.mappings import Source
 
 
 @dataclass(frozen=True)
@@ -18,6 +18,7 @@ class AppConfig:
     allowed_fields: Optional[set[str]] = None
     static_tags: Dict[str, str] = field(default_factory=dict)
     derived_tags: Dict[str, str] = field(default_factory=dict)
+    sources: list[Source] = field(default_factory=list)
 
     @classmethod
     def from_file(cls, config_path: str) -> "AppConfig":
@@ -49,6 +50,22 @@ class AppConfig:
                 if isinstance(key, str) and isinstance(value, str):
                     derived_tags[key] = value
 
+        raw_sources = payload.get("sources")
+
+        # All by default if not specified, otherwise parse the list of sources
+        sources = [Source.QENG_SERVINGCELL, Source.QCAINFO, Source.QGDNRCNT]
+        if isinstance(raw_sources, list):
+            sources = []
+            for item in raw_sources:
+                if isinstance(item, str):
+                    try:
+                        source_enum = Source.from_string(item)
+                        sources.append(source_enum)
+                    except ValueError as e:
+                        raise SystemExit(
+                            f"Invalid source '{item}' in {config_path}: {e}"
+                        )
+
         return cls(
             ssh_host=ssh_host,
             ssh_password=ssh_password,
@@ -59,6 +76,7 @@ class AppConfig:
             allowed_fields=allowed_fields,
             static_tags=static_tags,
             derived_tags=derived_tags,
+            sources=sources,
         )
 
     @staticmethod

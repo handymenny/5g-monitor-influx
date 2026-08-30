@@ -50,7 +50,11 @@ def collect_cells(
     nr_scc_idx = 0
 
     for comp in ca:
-        if comp.type not in (CarrierComponentType.LTE_SCC, CarrierComponentType.NR_SCC):
+        if serving_cells and comp.type in (
+            CarrierComponentType.LTE_PCC,
+            CarrierComponentType.NR_PCC,
+        ):
+            # Skip PCCs that have already been combined with serving cells.
             continue
 
         scc_combined = CombinedServingCell.from_sources(qcainfo=comp)

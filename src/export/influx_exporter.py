@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Dict, Optional
 
 from config.app_config import AppConfig
-from model.models import CombinedServingCell
+from model.models import CombinedServingCell, PacketDataCounter
 
 
 class InfluxExporter:
@@ -118,7 +118,7 @@ class InfluxExporter:
 
     def build_pktcnt_line(
         self,
-        pkt_cnt,
+        pkt_cnt: PacketDataCounter,
         timestamp_ns: int,
     ) -> str | None:
         line_tags = dict(self._static_tags)

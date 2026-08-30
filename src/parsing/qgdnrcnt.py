@@ -5,7 +5,7 @@ from model.models import PacketDataCounter
 from .common import parse_int, parse_response
 
 
-def parse_qgdnrcnt(response: str) -> PacketDataCounter:
+def parse_qgdnrcnt(response: str) -> PacketDataCounter | None:
     # Example response:
     # +QGDNRCNT: 231743605,4951875263
     #
@@ -26,4 +26,4 @@ def parse_qgdnrcnt(response: str) -> PacketDataCounter:
         except (ValueError, IndexError):
             pass
 
-    return PacketDataCounter(tx_bytes=0, rx_bytes=0)
+    return None

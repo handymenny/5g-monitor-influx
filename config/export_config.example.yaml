@@ -5,6 +5,12 @@ ssh_password: "REPLACE_WITH_SECURE_PASSWORD"
 timeout: 10.0
 measurement: modem_cells
 
+sources:
+  # Remove any sources you don't need, all enabled by default
+  - QENG_SERVINGCELL
+  - QCAINFO
+  - QGDNRCNT
+
 static_tags:
   host: 192.168.1.1
   model: Quectel
