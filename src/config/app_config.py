@@ -19,6 +19,7 @@ class AppConfig:
     static_tags: Dict[str, str] = field(default_factory=dict)
     derived_tags: Dict[str, str] = field(default_factory=dict)
     sources: list[Source] = field(default_factory=list)
+    temp_sensors: list[str] = field(default_factory=list)
 
     @classmethod
     def from_file(cls, config_path: str) -> "AppConfig":
@@ -50,8 +51,14 @@ class AppConfig:
                 if isinstance(key, str) and isinstance(value, str):
                     derived_tags[key] = value
 
-        raw_sources = payload.get("sources")
+        raw_temp_sensors = payload.get("temp_sensors")
+        temp_sensors: list[str] = []
+        if isinstance(raw_temp_sensors, list):
+            for item in raw_temp_sensors:
+                if isinstance(item, str):
+                    temp_sensors.append(item)
 
+        raw_sources = payload.get("sources")
         # All by default if not specified, otherwise parse the list of sources
         sources = [Source.QENG_SERVINGCELL, Source.QCAINFO, Source.QGDNRCNT]
         if isinstance(raw_sources, list):
@@ -77,6 +84,7 @@ class AppConfig:
             static_tags=static_tags,
             derived_tags=derived_tags,
             sources=sources,
+            temp_sensors=temp_sensors,
         )
 
     @staticmethod

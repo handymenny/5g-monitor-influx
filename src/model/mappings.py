@@ -8,6 +8,7 @@ class Source(str, Enum):
     QENG_SERVINGCELL = "QENG_SERVINGCELL"
     QCAINFO = "QCAINFO"
     QGDNRCNT = "QGDNRCNT"
+    QTEMP = "QTEMP"
 
     # from string to Source enum
     @classmethod
@@ -18,6 +19,8 @@ class Source(str, Enum):
             return cls.QCAINFO
         elif source_str == "QGDNRCNT":
             return cls.QGDNRCNT
+        elif source_str == "QTEMP":
+            return cls.QTEMP
         else:
             raise ValueError(f"Unknown source string: {source_str}")
 

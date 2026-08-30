@@ -137,3 +137,26 @@ class InfluxExporter:
             return line
 
         return None
+
+    def build_temp_lines(
+        self,
+        temp_readings: list,
+        timestamp_ns: int,
+    ) -> list[str]:
+        lines: list[str] = []
+        for reading in temp_readings:
+            line_tags = dict(self._static_tags)
+            raw_fields = asdict(reading)
+            for tag_key, field_key in self._derived_tags.items():
+                if field_key in raw_fields:
+                    tag_value = self._tag_value(raw_fields[field_key])
+                    if tag_value is not None:
+                        line_tags[tag_key] = tag_value
+
+            line = self.line(
+                self._measurement, line_tags, self._get_fields(reading), timestamp_ns
+            )
+            if line:
+                lines.append(line)
+
+        return lines

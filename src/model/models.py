@@ -242,3 +242,9 @@ class CombinedServingCell:
 class PacketDataCounter:
     tx_bytes: int
     rx_bytes: int
+
+
+@dataclass
+class TemperatureReading:
+    temp_sensor_name: str
+    temp_celsius: int

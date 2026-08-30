@@ -10,6 +10,14 @@ sources:
   - QENG_SERVINGCELL
   - QCAINFO
   - QGDNRCNT
+  - QTEMP
+
+temp_sensors:
+  # List all temperature sensors you want to monitor. The sensor names must match the output of the AT+QTEMP? command.
+  # If empty, no temperature readings will be exported.
+  - "modem-ambient-usr"
+  - "cpuss-0-usr"
+  - "modem-lte-sub6-pa1"
 
 static_tags:
   host: 192.168.1.1
@@ -43,6 +51,8 @@ allowed_fields:
   - state
   - tx_bytes
   - rx_bytes
+  - temp_celsius
+  - temp_sensor_name
 
 derived_tags:
   # You can add any fields you want to use as tags here. The key is the tag name, and the value is the field name to derive it from.
@@ -51,6 +61,7 @@ derived_tags:
   pci: pci
   arfcn: arfcn
   mnc: mnc
+  temp_sensor_name: temp_sensor_name
 
 # Notes:
 # - Copy this file to `config/export_config.yaml` and update sensitive values.

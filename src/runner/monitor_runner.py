@@ -6,6 +6,7 @@ import time
 import traceback
 
 from model.mappings import Source
+from parsing.qtemp import parse_qtemp
 
 from .atcmd_client import AtCmdClient
 from config.app_config import AppConfig
@@ -54,6 +55,16 @@ class MonitorRunner:
                 else:
                     qca_raw = ""
 
+                if Source.QTEMP in sources:
+                    temp_raw = atcmd_client.run("AT+QTEMP")
+                    if self._debug:
+                        print(
+                            "\nAT+QTEMP response:\n" + temp_raw,
+                            file=sys.stderr,
+                        )
+                else:
+                    temp_raw = ""
+
                 if Source.QGDNRCNT in sources:
                     pkt_cnt_raw = atcmd_client.run("AT+QGDNRCNT?")
                     if self._debug:
@@ -65,19 +76,23 @@ class MonitorRunner:
 
                 serving_cells = parse_qeng_servingcell(serving_raw)
                 ca = parse_qcainfo(qca_raw)
+                temp_readings = parse_qtemp(temp_raw, self._config.temp_sensors)
+                print(f"temp_readings: {temp_readings}", file=sys.stderr)
                 pkt_cnt = parse_qgdnrcnt(pkt_cnt_raw)
 
                 timestamp_ns = time.time_ns()
                 cells = collect_cells(serving_cells, ca)
                 exporter = InfluxExporter(self._config)
                 cell_lines = exporter.build_cell_lines(cells, timestamp_ns)
+                temp_lines = exporter.build_temp_lines(temp_readings, timestamp_ns)
+
                 if pkt_cnt:
                     pktcnt_line = exporter.build_pktcnt_line(pkt_cnt, timestamp_ns)
                 else:
                     pktcnt_line = None
 
-                # concatenate the cell lines and packet count line into a single list
-                lines = cell_lines
+                # concatenate the cell lines, packet count line, and temperature lines into a single list
+                lines = cell_lines + temp_lines
                 if pktcnt_line is not None:
                     lines.append(pktcnt_line)
 
